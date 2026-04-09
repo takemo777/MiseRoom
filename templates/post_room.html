@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>部屋投稿（AI評価付き）</h2>
+
+<div class="card">
+    <p style="font-size:14px;">
+        この画面では、
+        <strong>画像アップロード or カメラ撮影 → 画像リサイズ → AIで自動評価 → 投稿</strong>
+        までを行います。<br>
+    </p>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        <!-- 撮影日時 -->
+        <label for="captured_at">撮影日時（YYYY-MM-DD HH:MM:SS）</label>
+        <div class="field"
+             x-data="{
+                setNow() {
+                    const now = new Date();
+                    const yyyy = now.getFullYear();
+                    const MM = String(now.getMonth() + 1).padStart(2, '0');
+                    const dd = String(now.getDate()).padStart(2, '0');
+                    const hh = String(now.getHours()).padStart(2, '0');
+                    const mm = String(now.getMinutes()).padStart(2, '0');
+                    const ss = String(now.getSeconds()).padStart(2, '0');
+                    this.$refs.captureInput.value = `${yyyy}-${MM}-${dd} ${hh}:${mm}:${ss}`;
+                }
+             }">
+
+            <div style="display:flex; gap:8px; align-items:center;">
+                <input
+                    type="text"
+                    id="captured_at"
+                    name="captured_at"
+                    placeholder="2025-11-24 21:12:00"
+                    required
+                    x-ref="captureInput"
+                    style="flex:1 1 auto;">
+
+                <button type="button" @click="setNow()" style="white-space:nowrap;">
+                    現在時刻
+                </button>
+            </div>
+        </div>
+
+        <!-- 部屋画像（アップロード or カメラ撮影） -->
+        <label for="image">部屋画像</label>
+        <div class="field">
+
+            <div style="display:flex; gap:8px; align-items:center;">
+                <!-- ギャラリー用（スマホ：写真フォルダを開きたいので capture は付けない） -->
+                <input
+                    type="file"
+                    id="image"
+                    name="image"
+                    accept="image/*"
+                    required
+                    style="flex:1 1 auto;">
+
+                <!-- カメラボタン -->
+                <button
+                    type="button"
+                    id="cameraTriggerBtn"
+                    style="white-space:nowrap;">
+                    カメラで撮影
+                </button>
+            </div>
+
+            <!-- スマホ用：カメラ専用の hidden input（capture付き） -->
+            <input
+                type="file"
+                id="imageCameraInput"
+                accept="image/*"
+                capture="environment"
+                style="display:none;">
+
+            <!-- PC用：ブラウザカメラのプレビューエリア -->
+            <div id="cameraArea" style="margin-top:8px; display:none;">
+                <video id="cameraPreview"
+                       autoplay
+                       playsinline
+                       style="max-width:100%; border-radius:8px; background:#000;"></video>
+
+                <div style="margin-top:8px; display:flex; gap:8px;">
+                    <button type="button" id="captureBtn">
+                        シャッター
+                    </button>
+                    <button type="button" id="closeCameraBtn">
+                        カメラ停止
+                    </button>
+                </div>
+
+                <p style="font-size:12px; color:#666; margin-top:4px;">
+                    ※ シャッターを押すと、このプレビューの画像が投稿画像として選択されます。
+                </p>
+            </div>
+
+            <p style="font-size:12px; color:#666; margin-top:4px;">
+                ※ スマホの場合：<br>
+                　・「ファイルを選択」→ 写真フォルダから選択<br>
+                　・「カメラで撮影」→ カメラアプリを起動<br>
+                ※ PCの場合：「カメラで撮影」ボタンからブラウザカメラを起動できます。
+            </p>
+        </div>
+
+        <!-- 投稿ボタン -->
+        <button type="submit">
+            AIで評価して投稿
+        </button>
+
+    </form>
+</div>
+
+<!-- PC/スマホ兼用カメラ制御スクリプト -->
+<script>
+(function() {
+    const fileInput        = document.getElementById("image");             // ギャラリー用（フォームで送る本体）
+    const cameraBtn        = document.getElementById("cameraTriggerBtn");
+    const cameraFileInput  = document.getElementById("imageCameraInput");  // スマホ専用カメラ input
+    const cameraArea       = document.getElementById("cameraArea");
+    const video            = document.getElementById("cameraPreview");
+    const captureBtn       = document.getElementById("captureBtn");
+    const closeBtn         = document.getElementById("closeCameraBtn");
+
+    let stream = null;
+
+    // ざっくりなモバイル判定（iPhone / Android / iPad）
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/.test(navigator.userAgent);
+
+    async function startCamera() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert("このブラウザではカメラ機能がサポートされていません。");
+            return;
+        }
+
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: "environment" },
+                audio: false
+            });
+            video.srcObject = stream;
+            cameraArea.style.display = "block";
+        } catch (err) {
+            console.error("カメラ起動に失敗:", err);
+            alert("カメラの起動に失敗しました。権限設定をご確認ください。");
+        }
+    }
+
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+        video.srcObject = null;
+        cameraArea.style.display = "none";
+    }
+
+    function capturePhoto() {
+        if (!stream) {
+            alert("カメラが起動していません。");
+            return;
+        }
+
+        const trackSettings = stream.getVideoTracks()[0].getSettings();
+        const width  = trackSettings.width  || video.videoWidth  || 640;
+        const height = trackSettings.height || video.videoHeight || 480;
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, width, height);
+
+        canvas.toBlob(function(blob) {
+            if (!blob) {
+                alert("画像のキャプチャに失敗しました。");
+                return;
+            }
+
+            const file = new File([blob], "camera_capture.jpg", { type: "image/jpeg" });
+
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            fileInput.files = dt.files;
+
+            alert("カメラで撮影した画像を選択しました。");
+
+            // 撮影後はカメラ停止
+            stopCamera();
+        }, "image/jpeg", 0.9);
+    }
+
+    // ここで PC / スマホ で挙動を分岐
+    if (isMobile === true) {
+        // ◆ スマホ：OS標準のカメラUIと写真フォルダを使う
+        cameraArea.style.display = "none"; // ブラウザカメラUIは使わない
+
+        if (cameraBtn && cameraFileInput) {
+            // カメラボタン → カメラ専用 input を開く
+            cameraBtn.addEventListener("click", function() {
+                cameraFileInput.click();
+            });
+
+            // カメラ専用 input に画像が入ったら、それを本体 side（image）にコピー
+            cameraFileInput.addEventListener("change", function() {
+                if (cameraFileInput.files && cameraFileInput.files.length > 0) {
+                    const dt = new DataTransfer();
+                    dt.items.add(cameraFileInput.files[0]);
+                    fileInput.files = dt.files;
+                    alert("カメラで撮影した画像を選択しました。");
+                }
+            });
+        }
+
+    } else {
+        // ◆ PC：ブラウザカメラ（getUserMedia）を使う
+        if (cameraBtn) {
+            cameraBtn.addEventListener("click", startCamera);
+        }
+        if (closeBtn) {
+            closeBtn.addEventListener("click", stopCamera);
+        }
+        if (captureBtn) {
+            captureBtn.addEventListener("click", capturePhoto);
+        }
+    }
+})();
+</script>
+
+{% endblock %}
