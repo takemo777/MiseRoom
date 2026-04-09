@@ -1,6 +1,10 @@
 # MiseRoom
 
-<h2 align="center">Web×IoT メイカーズチャレンジ PLUS in 愛媛 特別賞 受賞作品</h2>
+<p align="center">
+  <span style="font-size: 24px; font-weight: bold;">
+    Web×IoT メイカーズチャレンジ PLUS in 愛媛 特別賞 受賞作品
+  </span>
+</p>
 
 <p align="center">
   <img src="static/icon/miseroom_icon.png" alt="アイコン" height="300">
