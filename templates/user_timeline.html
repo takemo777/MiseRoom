@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% from "partials/evaluation_card.html" import evaluation_card %}
+
+{% block content %}
+<h2>{{ target_user_name }} さんのタイムライン</h2>
+
+<p style="font-size:13px; color:#555;">
+    「MiseRoom」への公開設定がONになっているユーザーの、<br>
+    公開されている評価履歴です。
+</p>
+
+{% if evaluations %}
+    {% for ev in evaluations %}
+        {{ evaluation_card(ev) }}
+    {% endfor %}
+{% else %}
+    <p>まだ公開されている評価がありません。</p>
+{% endif %}
+{% endblock %}
