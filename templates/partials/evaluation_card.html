@@ -1,0 +1,85 @@
+{% macro evaluation_card(ev, show_status=True) %}
+<div class="card">
+
+    <div><strong>撮影日時:</strong> {{ ev["captured_at"] }}</div>
+
+    <div>
+        <strong>スコア:</strong> {{ ev["score"] }}点
+        <span class="badge {{ ev['level'] }}">{{ ev["level"] }}</span>
+    </div>
+
+    <div><strong>コメント:</strong> {{ ev["comment"] }}</div>
+
+    {% if ev["advice"] %}
+        <div><strong>アドバイス:</strong> {{ ev["advice"] }}</div>
+    {% endif %}
+
+    {# 状態ステータス（タイムラインなど show_status=True のときのみ表示）     #}
+    {# need_cleaning / cleaned / overdue に応じてラベルの色が変わる            #}
+    {% if show_status %}
+        <div>
+            <span class="status-label
+                {% if ev['status'] == 'need_cleaning' %}status-need
+                {% elif ev['status'] == 'cleaned' %}status-cleaned
+                {% elif ev['status'] == 'overdue' %}status-overdue
+                {% endif %}">
+                
+                状態：
+                {% if ev['status'] == 'need_cleaning' %}
+                    要掃除
+                    {% if ev['due_at'] %}
+                        (期限: {{ ev['due_at'] }})
+                    {% endif %}
+                {% elif ev['status'] == 'cleaned' %}
+                    掃除済み
+                {% elif ev['status'] == 'overdue' %}
+                    期限切れ（家族に公開URLが生成されています）
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+    
+    {# 部屋主の表示#}
+    {# ev["user_name"] が存在すればそのユーザーのカード（公開系 or みんなの部屋）#}
+    {# ev["user_name"] が存在しなければ自分のタイムライン#}
+    {# さらに、自分自身か他人かでリンク先を変更する                           #}
+
+    {% set owner_name = ev.get("user_name") or session.get("user_name") %}
+
+    {% if owner_name %}
+        <div style="color:#777; font-size:13px; margin-top:4px;">
+            部屋主：
+
+            {# 他ユーザーのカード（公開 or みんなの部屋） #}
+            {% if ev.get("user_name") %}
+
+                {# 自分自身のカードなら MYタイムラインへ飛ばす #}
+                {% if owner_name == session.get("user_name") %}
+                    <a href="{{ url_for('timeline') }}"
+                       style="color:#777; text-decoration: underline;">
+                        {{ owner_name }}
+                    </a>
+
+                {# 他人のカードならその人の公開タイムラインへ #}
+                {% else %}
+                    <a href="{{ url_for('public_timeline', user_name=owner_name) }}"
+                       style="color:#777; text-decoration: underline;">
+                        {{ owner_name }}
+                    </a>
+                {% endif %}
+
+            {% else %}
+                {{ owner_name }}
+            {% endif %}
+
+        </div>
+    {% endif %}
+
+    {% if ev["image_path"] %}
+    <div>
+        <img src="/{{ ev['image_path'] }}" alt="room image" class="thumbnail">
+    </div>
+    {% endif %}
+
+</div>
+{% endmacro %}
