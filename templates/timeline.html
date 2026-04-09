@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% from "partials/evaluation_card.html" import evaluation_card %}
+
+{% for ev in evaluations %}
+  {{ evaluation_card(ev, show_status=True) }}
+{% endfor %}
+
+{% block content %}
+<h2>タイムライン</h2>
+
+{% if best_score is not none %}
+<div class="card">
+    <div>
+        <strong>ベストスコア:</strong> {{ best_score }}点 ({{ best_level }})
+    </div>
+    <div>
+        <strong>ベストスコア取得日時:</strong> {{ best_captured_at }}
+    </div>
+</div>
+{% endif %}
+
+{% for e in evaluations %}
+    {{ evaluation_card(e, show_status=True) }}
+{% else %}
+<p>まだ評価データがありません。</p>
+{% endfor %}
+{% endblock %}
