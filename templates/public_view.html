@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% from "partials/evaluation_card.html" import evaluation_card %}
+
+{% block content %}
+<h2>部屋の状態（公開ビュー）</h2>
+
+{% if current %}
+    <h3 style="margin-top:16px;">今回の評価</h3>
+    {{ evaluation_card(current, show_status=True) }}
+
+    {% if prev %}
+        <h3 style="margin-top:24px;">前回の評価</h3>
+        {{ evaluation_card(prev, show_status=True) }}
+    {% endif %}
+{% else %}
+    <p>評価データが見つかりません。</p>
+{% endif %}
+
+{% endblock %}
