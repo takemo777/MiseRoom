@@ -96,10 +96,19 @@ Raspberry Piと人感センサを用いて、**無人時に部屋を自動撮影
 - Gmail SMTP / smtplib
 
 
+### ハードウェア・IoT
+
+- Raspberry Pi Camera
+- 人感センサ
+- LED
+- Bluetoothスピーカー
+- CHIRIMEN
+
+
 ### 実行環境
 
 - PythonAnywhere
-- Raspberry Pi
+- Raspberry Pi Zero
 
 
 
