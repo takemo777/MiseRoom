@@ -2,7 +2,9 @@
 
 **Web×IoT メイカーズチャレンジ PLUS in 愛媛 特別賞 受賞作品**
 
-<img src="static/icon/miseroom_icon.png" alt="アイコン" width="300">
+<p align="center">
+  <img src="static/icon/miseroom_icon.png" alt="アイコン" height="300">
+</p>
 
 > **AIが部屋の状態を見える化し、片付け行動を後押しする掃除支援アプリ**
 
