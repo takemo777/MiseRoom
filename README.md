@@ -30,7 +30,7 @@ Raspberry Piと人感センサを用いて、**無人時に部屋を自動撮影
 ## URL
 - **URL:** [https://miseroom.pythonanywhere.com](https://miseroom.pythonanywhere.com)
 - **テストユーザー:** メールアドレス: sample@example.com / パスワード: sample12345  
-※部屋の評価を行う場合は、新規登録のうえ、設定ページで公開設定をオフにし、生成AIによって生成された部屋画像を使用することを推奨します。
+**※部屋の評価を行う場合は、新規登録のうえ、設定ページで公開設定をオフにし、生成AIによって生成された部屋画像を使用することを推奨します。**
 
 
 
