@@ -1,6 +1,6 @@
 # MiseRoom
 
-![アイコン](static/icon/miseroom_icon.png)
+<img src="static/icon/miseroom_icon.png" alt="アイコン" width="120">
 
 **Web×IoT メイカーズチャレンジ PLUS in 愛媛 特別賞 受賞作品**
 
