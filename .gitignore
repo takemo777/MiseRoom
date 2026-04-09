@@ -1,0 +1,27 @@
+__pycache__/
+*.pyc
+
+venv/
+
+instance/
+
+upload_data.py
+
+db/*.sqlite
+
+static/uploads/
+tmp_uploads/
+
+build/
+dist/
+*.egg-info/
+
+.DS_Store
+Thumbs.db
+
+.vscode/
+
+.env
+.flaskenv
+.env.*
+Raspberry Pi/.env
