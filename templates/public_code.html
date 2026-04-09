@@ -1,0 +1,18 @@
+
+{% extends "base.html" %}
+{% block content %}
+<h2>ワンタイムコード入力</h2>
+<div class="card">
+    <p>家族用ページです。共有されたワンタイムコードを入力してください。</p>
+    {% if error_message %}
+    <div class="msg msg-error">{{ error_message }}</div>
+    {% endif %}
+    <form method="POST">
+        <div class="field">
+            <label for="one_time_code">ワンタイムコード</label>
+            <input type="text" id="one_time_code" name="one_time_code" required>
+        </div>
+        <button type="submit">表示する</button>
+    </form>
+</div>
+{% endblock %}
