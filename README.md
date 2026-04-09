@@ -1,7 +1,7 @@
 # MiseRoom
 
 <h3 align="center">
-  Web×IoT メイカーズチャレンジ PLUS in 愛媛 特別賞 受賞作品
+  Web×IoT メイカーズチャレンジ PLUS in 愛媛 特別賞
 </h3>
 
 <p align="center">
