@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block content %}
+
+{# 評価JSONの手動登録画面 #}
+{# ・画像アップロード #}
+{# ・リサイズ #}
+{# ・評価JSON貼り付け → DB登録 #}
+{#  #}
+<h2>評価JSONの手動登録</h2>
+
+<div class="card">
+    <p style="font-size:14px;">
+        この画面ひとつで、
+        <strong>画像アップロード → リサイズ → 評価JSON登録</strong> まで行います。<br>
+        本来は Raspberry Pi が撮影した画像をサーバーへ送信し、
+        生成AIが自動で部屋の綺麗さを評価する想定ですが、<br>
+        開発中の現在は手動アップロードと手動評価JSON入力で代替しています。<br>
+        アップロードされた画像は長辺 1024px・JPEG 品質80で自動リサイズされ、保存されます。<br>
+        評価JSONは<a href="#prompt-area" style="color:#007bff; text-decoration:underline;">こちら</a>で生成できます。
+    </p>
+<form method="POST" enctype="multipart/form-data">
+    <!--撮影日時の入力-->
+    <div class="field" x-data="{
+        setNow() {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const MM = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const hh = String(now.getHours()).padStart(2, '0');
+            const mm = String(now.getMinutes()).padStart(2, '0');
+            const ss = String(now.getSeconds()).padStart(2, '0');
+            this.$refs.captureInput.value = `${yyyy}-${MM}-${dd} ${hh}:${mm}:${ss}`;
+        }
+    }">
+        <label for="captured_at">撮影日時（YYYY-MM-DD HH:MM:SS）</label>
+
+        <div style="display:flex; gap:8px;">
+            <input
+                type="text"
+                id="captured_at"
+                name="captured_at"
+                placeholder="2025-11-24 21:12:00"
+                required
+                x-ref="captureInput">
+
+            <!-- 現在時刻を自動入力するボタン -->
+            <button
+                type="button"
+                @click="setNow()"
+                style="white-space:nowrap;">
+                現在時刻
+            </button>
+        </div>
+    </div>
+
+    <!-- 部屋画像のアップロード（リサイズ対象） -->
+    <div class="field">
+        <label for="image">部屋画像ファイル</label>
+        <input type="file" id="image" name="image" accept="image/*" required>
+    </div>
+
+    <!-- 生成AIが返した評価JSONを丸ごと貼り付けるテキストエリア -->
+    <div class="field">
+        <label for="json">評価JSON</label>
+        <textarea id="json" name="json" rows="15" required></textarea>
+    </div>
+
+    <!-- 送信ボタン：サーバ側で 画像リサイズ → ファイル保存 → JSON保存処理 -->
+    <button type="submit">画像リサイズして評価を登録</button>
+</form>
+
+<!-- 評価用プロンプト表示エリア -->
+<!-- ・「プロンプトをコピー」ボタンでクリップボードに一括コピー -->
+<div id="prompt-area" class="card" style="margin-top: 16px;">
+    <h3>評価用プロンプト（コピーして生成AIに貼り付け）</h3>
+    <p style="font-size:14px;">
+        下記のプロンプトをそのままコピーして、画像と一緒に生成AIに投げてください。<br>
+        返ってきたJSONを上の「評価JSON」欄に貼り付けて登録します。
+    </p>
+
+    <div x-data="{ copied: false }">
+        <button
+            type="button"
+            @click="navigator.clipboard.writeText($refs.promptText.innerText); copied = true; setTimeout(() => { copied = false }, 1500);"
+            style="margin-bottom:10px;">
+            <span x-show="!copied">プロンプトをコピー</span>
+            <span x-show="copied">コピーしました！</span>
+        </button>
+
+        <!-- プロンプト文言。変更推奨 -->
+        <pre x-ref="promptText"
+             style="white-space: pre-wrap; background:#f8f8f8; padding:12px; border-radius:6px; font-size:12px; max-height:400px; overflow:auto;">
+あなたは「部屋の綺麗さ評価アシスタント」です。
+与えられた画像は『部屋の様子』です。
+
+次の10個の観点を内部的な評価軸として用いながら、
+最終的に「総合スコア」「レベル」「コメント」「アドバイス」だけを JSON で返してください。
+
+内部で考慮する評価項目（すべて 0〜100 点で頭の中で評価すること）:
+	•	clutter: 床や机に物が散乱している度合い（多いほど点数低い）
+	•	cleanliness: ゴミ・汚れ・ホコリの見え方（汚いほど点数低い）
+	•	organization: 物の配置の整い具合（整っているほど高い）
+	•	floor_visibility: 床の可視範囲（広いほど高い）
+	•	trash_presence: ゴミ袋・空き缶・食べ残し等の存在（多いほど低い）
+	•	laundry_presence: 洗濯物・衣類が放置されている度合い（多いほど低い）
+	•	desk_orderliness: 机周辺の整理整頓（整っているほど高い）
+	•	bed_state: ベッドが整っているか（寝具の乱れ・放置物）
+	•	pathways_clearance: 部屋の動線が確保されているか（歩けるスペースがあるか）
+	•	hygiene_risk: カビ・飲食物放置など衛生的リスク（高いほど低い点）
+
+総合スコア:
+	•	上記の観点を総合的に判断し、0〜100 点の整数で「score」として出力すること。
+
+レベル分類:
+	•	90〜100: “very_clean”
+	•	70〜89: “clean”
+	•	50〜69: “normal”
+	•	30〜49: “messy”
+	•	0〜29: “very_messy”
+
+出力条件（重要）:
+	•	必ず JSON のみを返す
+	•	説明文・前置き・補足は禁止
+	•	全フィールドを必ず含める
+	•	値はすべて整数（score）と文字列（level/comment/advice）のみとする
+
+出力フォーマット（この形を厳守）:
+
+{
+“score”: 0,
+“level”: “string”,
+“comment”: “string”,
+“advice”: “string”
+}
+</pre>
+    </div>
+</div>
+{% endblock %}
