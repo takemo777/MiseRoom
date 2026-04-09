@@ -1,10 +1,13 @@
 # MiseRoom
 
-<img src="static/icon/miseroom_icon.png" alt="アイコン" width="300">
-
 **Web×IoT メイカーズチャレンジ PLUS in 愛媛 特別賞 受賞作品**
 
 > **AIが部屋の状態を見える化し、片付け行動を後押しする掃除支援アプリ**
+
+
+<img src="static/icon/miseroom_icon.png" alt="アイコン" width="300">
+
+
 
 MiseRoomは、部屋の写真をもとにAIが綺麗さを評価し、改善アドバイスを提示する **掃除支援Webアプリ**です。  
 Raspberry Piと人感センサを用いて、**無人時に部屋を自動撮影・評価し、在室時には音声で掃除を促す**仕組みを実装しました。  
