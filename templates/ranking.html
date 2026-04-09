@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% from "partials/evaluation_card.html" import evaluation_card %}
+
+{% block content %}
+<h2>ランキング</h2>
+
+<h3>スコア上位5件</h3>
+{% if top5 %}
+    {% for e in top5 %}
+        {{ evaluation_card(e) }}
+    {% endfor %}
+{% else %}
+<p>まだランキング対象のデータがありません。</p>
+{% endif %}
+
+<h3>最低スコア</h3>
+{% if lowest %}
+    {{ evaluation_card(lowest) }}
+{% else %}
+<p>最低スコアのデータがまだありません。</p>
+{% endif %}
+{% endblock %}
