@@ -1,5 +1,7 @@
 # MiseRoom
 
+![アイコン](static/icon/miseroom_icon.png)
+
 **Web×IoT メイカーズチャレンジ PLUS in 愛媛 特別賞 受賞作品**
 
 > **AIが部屋の状態を見える化し、片付け行動を後押しする掃除支援アプリ**
