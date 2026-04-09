@@ -1,0 +1,22 @@
+
+{% extends "base.html" %}
+{% block content %}
+<h2>ログイン</h2>
+<div class="card">
+    <form method="POST">
+        <div class="field">
+            <label for="email">メールアドレス</label>
+            <input type="text" id="email" name="email" required>
+        </div>
+        <div class="field">
+            <label for="password">パスワード</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">ログイン</button>
+    </form>
+    <p style="margin-top:8px;font-size:13px;">
+        アカウントをお持ちでない方は
+        <a href="{{ url_for('register') }}">新規登録</a>
+    </p>
+</div>
+{% endblock %}
