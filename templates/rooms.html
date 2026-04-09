@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% from "partials/evaluation_card.html" import evaluation_card %}
+
+{% block content %}
+<h2>MiseRoom</h2>
+
+<p style="font-size:13px; color:#555;">
+    公開設定をONにしているユーザーの部屋評価カードが、<br>
+    新着順で表示されます。
+</p>
+
+{% if evaluations %}
+    {% for e in evaluations %}
+        {{ evaluation_card(e) }}
+    {% endfor %}
+{% else %}
+<p>まだ公開されている評価がありません。</p>
+{% endif %}
+{% endblock %}
