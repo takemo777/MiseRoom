@@ -24,4 +24,4 @@ Thumbs.db
 .env
 .flaskenv
 .env.*
-Raspberry Pi/.env
+Raspberry_Pi/.env
