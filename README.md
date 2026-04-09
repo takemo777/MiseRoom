@@ -1,9 +1,7 @@
 # MiseRoom
 
 <p align="center">
-  <span style="font-size: 24px; font-weight: bold;">
-    Web×IoT メイカーズチャレンジ PLUS in 愛媛 特別賞 受賞作品
-  </span>
+  <strong><font size="6">Web×IoT メイカーズチャレンジ PLUS in 愛媛 特別賞 受賞作品</font></strong>
 </p>
 
 <p align="center">
