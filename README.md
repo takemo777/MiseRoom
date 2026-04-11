@@ -126,6 +126,9 @@ Phase 1で評価対象となった場合、以下の基準で内部採点（0-10
   "comment": "string",
   "advice": "string"
 }
+ ```
+</div>
+</details>
 
 
 
